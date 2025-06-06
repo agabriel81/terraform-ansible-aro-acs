@@ -188,17 +188,18 @@
                     limits:
                       memory: 4Gi
                       cpu: 2
-                analyzer:
-                  scaling:
-                    autoScaling: Disabled
-                    replicas: 1
-                  resources:
-                    requests:
-                      memory: 512Mi
-                      cpu: 250m
-                    limits:
-                      memory: 2Gi
-                      cpu: 1
+                scanner:
+                  analyzer:
+                    scaling:
+                      autoScaling: Disabled
+                      replicas: 1
+                    resources:
+                      requests:
+                        memory: 512Mi
+                        cpu: 250m
+                      limits:
+                        memory: 2Gi
+                        cpu: 1
           register: r_k8s
           until: r_k8s is successful
           retries: 30

@@ -218,7 +218,7 @@
           retries: 15
 
         # Verify ACS is working
-	- name: Get the ACS portal route
+        - name: Get the ACS portal route
 	  kubernetes.core.k8s_info:
 	    api_version: route.openshift.io/v1
 	    kind: Route

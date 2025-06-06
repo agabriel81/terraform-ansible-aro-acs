@@ -95,7 +95,7 @@ Start the Ansible Playbook:
 
 ```
 $ cd terraform-aro/ansible
-$ ansible-playbook playbook.yaml -e install_operator_name=rhacs-operator
+$ ansible-playbook playbook.yaml -e ocp4_workload_rhacs_central_admin_password=<your ACS admin password>
 ```
 
 

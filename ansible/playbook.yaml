@@ -219,51 +219,51 @@
 
         # Verify ACS is working
         - name: Get the ACS portal route
-	  kubernetes.core.k8s_info:
-	    api_version: route.openshift.io/v1
-	    kind: Route
-	    name: central
-	    namespace: stackrox
-	  register: r_acs_portal_route
-	  until: r_acs_portal_route is successful
-	  retries: 30
-	  delay: 5
-
-	- name: Get Web Console route
-	  kubernetes.core.k8s_info:
-	    api_version: route.openshift.io/v1
-	    kind: Route
-	    namespace: openshift-console
-	    name: console
-	  register: r_console_route
-	  until: r_console_route is successful
-	  retries: 30
-	  delay: 5
-
-	- name: Get API server URL
-	  kubernetes.core.k8s_info:
-	    api_version: config.openshift.io/v1
-	    kind: Infrastructure
-	    name: cluster
-	  register: r_api_url
-	  until: r_api_url is successful
-	  retries: 30
-	  delay: 5
-
-	- name: Set fact for ACS route
-	  ansible.builtin.set_fact:
-	    acs_route: "{{ r_acs_portal_route.resources[0].spec.host }}"
-
-	- name: Print user info
-	  agnosticd_user_info:
-	    msg: "{{ item }}"
-	  loop:
-	  - ""
-	  - "Your RHACS console is available at:"
-	  - "https://{{ acs_route }}"
-	  - "RHACS portal username: admin"
-	  - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
-
+          kubernetes.core.k8s_info:
+            api_version: route.openshift.io/v1
+            kind: Route
+            name: central
+            namespace: stackrox
+          register: r_acs_portal_route
+          until: r_acs_portal_route is successful
+          retries: 30
+          delay: 5
+       
+        - name: Get Web Console route
+          kubernetes.core.k8s_info:
+            api_version: route.openshift.io/v1
+            kind: Route
+            namespace: openshift-console
+            name: console
+          register: r_console_route
+          until: r_console_route is successful
+          retries: 30
+          delay: 5
+       
+        - name: Get API server URL
+          kubernetes.core.k8s_info:
+            api_version: config.openshift.io/v1
+            kind: Infrastructure
+            name: cluster
+          register: r_api_url
+          until: r_api_url is successful
+          retries: 30
+          delay: 5
+       
+        - name: Set fact for ACS route
+          ansible.builtin.set_fact:
+            acs_route: "{{ r_acs_portal_route.resources[0].spec.host }}"
+       
+        - name: Print user info
+          agnosticd_user_info:
+            msg: "{{ item }}"
+          loop:
+          - ""
+          - "Your RHACS console is available at:"
+          - "https://{{ acs_route }}"
+          - "RHACS portal username: admin"
+          - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
+       
       always:
         - name: If login succeeded, try to log out (revoke access token)
           when: openshift_auth_results.openshift_auth.api_key is defined

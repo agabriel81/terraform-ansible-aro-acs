@@ -6,6 +6,21 @@ metadata:
   namespace: stackrox
 spec:
   central:
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 750m
+      limits:
+        memory: 2Gi
+        cpu: 2
+    db:
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 750m
+        limits:
+          memory: 2Gi
+          cpu: 2
     adminPasswordSecret:
       name: acs-password
     exposure:

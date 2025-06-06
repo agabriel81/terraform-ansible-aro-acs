@@ -103,7 +103,7 @@
   register: r_install_plans
   vars:
     _query: >-
-      [?contains(spec.clusterServiceVersionNames[] | join(',', @), '{{ install_operator_csv_nameprefix }}) && status.phase ]
+      [?contains(spec.clusterServiceVersionNames[] | join(',', @), '{{ install_operator_csv_nameprefix }}') && status.phase ]
   retries: 100
   delay: 10
   until:

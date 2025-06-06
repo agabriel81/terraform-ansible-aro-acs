@@ -4,7 +4,7 @@
     - vars/var_file.yaml
   module_defaults:
     redhat.openshift.openshift_auth:
-      host: "{{ aro_api }}"
+      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
       ca_cert: ca.pem
       validate_certs: no
   tasks:

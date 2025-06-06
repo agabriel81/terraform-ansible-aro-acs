@@ -1,4 +1,3 @@
-aro_api: https://api.agabriel-eus.eastus.aroapp.io:6443/
 ocp_username: kubeadmin
 
 become_override: false

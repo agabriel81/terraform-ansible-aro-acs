@@ -67,15 +67,21 @@ https://console.redhat.com/ansible/automation-hub/token
 Clone this repository:
 
 ```
-$ git clone <repo>
+$ git clone https://github.com/agabriel81/terraform-ansible-aro-acs.git
 ```
 
 A `custom_data` content was deployed in the `jumphost` host in the file `/var/lib/cloud/instance/scripts/part-001`, it's possible to review it and complete the configuration of the Ansbile Controller.
 
-Make sure to export the K8S_AUTH_API_KEY as environment variable containing the token to authenticate to the OpenShift (ARO) cluster.
+If the collection aren't installed for any reason, make sure to export the `ANSIBLE_CONFIG` variable pointing to the `ansible.cfg` file containing the Ansible Collection token.
 
 ```
-$ export K8S_AUTH_API_KEY=token
+$ export ANSIBLE_CONFIG=token
+```
+
+Make sure to export the `K8S_AUTH_API_KEY` as environment variable containing the token to authenticate to the OpenShift (ARO) cluster and the `K8S_AUTH_HOST`.
+```
+$ export K8S_AUTH_API_KEY=<ARO API token>
+$ export K8S_AUTH_HOST=https://api.<your cluster domain>:6443
 ```
 
 Review the `var_files.yaml` matching your ARO resources.

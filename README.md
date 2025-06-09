@@ -42,6 +42,11 @@ $ terraform plan
 $ terraform apply 
 ```
 
+A `jumhost` virtual machine was deployed and it's accessible via SSH through the Public IP and SSH key provided using the `adminuser`. 
+This Virtual Machine is configured as an Ansible Controller (ansible-core, python, Ansible collection installed etc) where the Ansible playbook was launched in order to deploy Red Hat Advanced Cluster Security.
+
+A `custom_data` content was deployed in the `jumphost` host for configuring it as an Ansible Controller via in the file `/var/lib/cloud/instance/scripts/part-001`.
+
 You'll receive the `console_url`, `api_url` and `jumphost public IP` at the end of the process
 
 After completing the installation, retrieve ARO credentials, ARO console and ARO API URL:
@@ -51,56 +56,7 @@ $ az aro list-credentials --name ${TF_VAR_cluster_name} --resource-group ${TF_VA
 $ az aro show --name ${TF_VAR_cluster_name} --resource-group ${TF_VAR_resourcegroup_name} --query "consoleProfile.url" -o tsv
 $ az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query apiserverProfile.url -o tsv 
 $ oc login $(az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query apiserverProfile.url -o tsv) -u kubeadmin
-
 ```
-
-A `jumhost` virtual machine was deployed and it's accessible via SSH through the Public IP and SSH key provided using the adminuser. 
-This Virtual Machine is configured as an Ansible Controller (ansible-core, python, Ansible collection installed etc) where we can launch our Ansible playbook to deploy Red Hat Advanced Cluster Security.
-
-Clone this repository and update `ansible.cfg` data with your Ansible Hub token to complete the Ansible Controller configuration.
-Refresh the token:
-
-```
-https://console.redhat.com/ansible/automation-hub/token
-```
-
-Clone this repository:
-
-```
-$ git clone https://github.com/agabriel81/terraform-ansible-aro-acs.git
-```
-
-A `custom_data` content was deployed in the `jumphost` host in the file `/var/lib/cloud/instance/scripts/part-001`, it's possible to review it and complete the configuration of the Ansbile Controller.
-
-If the collection aren't installed for any reason, make sure to export the `ANSIBLE_CONFIG` variable pointing to the `ansible.cfg` file containing the Ansible Collection token.
-
-```
-$ export ANSIBLE_CONFIG=token
-```
-
-Make sure to export the `K8S_AUTH_API_KEY` as environment variable containing the token to authenticate to the OpenShift (ARO) cluster and the `K8S_AUTH_HOST`.
-```
-$ export K8S_AUTH_API_KEY=<ARO API token>
-$ export K8S_AUTH_HOST=https://api.<your cluster domain>:6443
-```
-
-Review the `var_files.yaml` matching your ARO resources.
-
-```
-$ cd terraform-aro/ansible/vars
-$ vi var_files.yaml
-```
-
-Start the Ansible Playbook:
-
-```
-$ cd terraform-aro/ansible
-$ ansible-playbook playbook.yaml -e ocp4_workload_rhacs_central_admin_password=<your ACS admin password>
-```
-
-
-
-
 
 
 

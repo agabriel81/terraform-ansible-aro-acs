@@ -235,7 +235,7 @@
             msg:
             - ""
             - "Your RHACS console is available at:"
-            - "https://{{ r_acs_portal_route }}"
+            - "https://{{ r_acs_portal_route.resources[0].spec.host }}"
             - "RHACS portal username: admin"
             - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
        

@@ -49,7 +49,7 @@ This Virtual Machine is configured as an Ansible Controller (ansible-core, pytho
 
 A `custom_data` content was deployed in the `jumphost` host for configuring it as an Ansible Controller via in the file `/var/lib/cloud/instance/scripts/part-001`.
 
-You'll receive the `console_url`, `api_url` and `jumphost public IP` at the end of the process
+You'll receive the ACS route, ACS username/password, ARO `console_url`, ARO `api_url` and `jumphost public IP` at the end of the process.
 
 After completing the installation, retrieve ARO credentials, ARO console and ARO API URL:
 
@@ -60,9 +60,13 @@ $ az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query 
 $ oc login $(az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query apiserverProfile.url -o tsv) -u kubeadmin
 ```
 
+If it's needed to debug the Ansible playbook, please export the `K8S_AUTH_API_KEY` and `K8S_AUTH_HOST` in the `jumphost` Virtual Machine.
+The ARO API token is saved into the `/tmp/openshift.token` both locally and in the `jumphost`.
 
 
 REFERENCE
 
-https://github.com/redhat-cop/agnosticd/blob/lb1153-1.2/ansible/roles_ocp_workloads/ocp4_workload_rhacs/tasks/workload.yml
-https://registry.terraform.io/providers/hashicorp/azurerm/4.30.0/docs/resources/redhat_openshift_cluster
+- https://github.com/redhat-cop/agnosticd/
+- https://registry.terraform.io/providers/hashicorp/azurerm/4.30.0/docs/resources/redhat_openshift_cluster
+- https://docs.ansible.com/ansible/latest/collections/community/okd/index.html
+- https://docs.ansible.com/ansible/latest/collections/community/general/index.html

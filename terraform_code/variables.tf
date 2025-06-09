@@ -56,3 +56,7 @@ variable "jumphost_subnet_cidr" {
     type = string
     default = "10.0.2.0/27"
 }
+
+variable "acs_password" {
+  type = string
+}

@@ -278,7 +278,7 @@ resource "null_resource" "ansible_playbook" {
       "export K8S_AUTH_HOST=${local.openshift_api_url}",
       "export K8S_AUTH_API_KEY=$(cat /tmp/openshift.token)",
       "git clone -b 4.17-4.6 https://github.com/agabriel81/terraform-ansible-aro-acs.git",
-      "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml"
+      "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml -e ocp4_workload_rhacs_central_admin_password=${var.acs_password}"
     ]
 
     connection {

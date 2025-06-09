@@ -1,5 +1,7 @@
 # since these variables are re-used - a locals block makes this more maintainable
 locals {
+  openshift_api_url              = azurerm_redhat_openshift_cluster.aro_cluster.apiserver_profile[0].url
+  admin_password                 = azurerm_redhat_openshift_cluster.aro_cluster.cluster_admin_password
   jumphost_pip                   = "${var.cluster_name}-jumphost-pip"
   jumphost_subnet_cidr           = "${var.jumphost_subnet_cidr}"
   jumphost_nsg                   = "${var.cluster_name}-jumphost_nsg"
@@ -225,6 +227,8 @@ resource "null_resource" "ansible_playbook" {
 
   provisioner "remote-exec" {
     inline = [
+      "export K8S_AUTH_HOST=${local.openshift_api_url}",
+      "export K8S_AUTH_API_KEY=${local.admin_password}"
       "ansible-playbook playbook.yml"
     ]
 

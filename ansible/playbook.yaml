@@ -250,6 +250,15 @@
           until: r_api_url is successful
           retries: 30
           delay: 5
+
+        - name: Print info
+          ansible.builtin.debug:
+            msg:
+            - ""
+            - "Your RHACS console is available at:"
+            - "https://{{ acs_route }}"
+            - "RHACS portal username: admin"
+            - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
        
       always:
         - name: If login succeeded, try to log out (revoke access token)

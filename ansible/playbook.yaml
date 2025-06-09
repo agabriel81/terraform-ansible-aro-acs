@@ -2,22 +2,14 @@
   hosts: localhost
   vars_files:
     - vars/var_file.yaml
-#  module_defaults:
-#    community.okd.openshift_auth:
-#      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
-#      ca_cert: ca.pem
-#      validate_certs: no
-#    register: openshift_auth_results
+  module_defaults:
+    community.okd.openshift_auth:
+      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
+      ca_cert: ca.pem
+      validate_certs: no
   tasks:
     - name: Authenticate to OpenShift cluster and gell a list of all pods from any namespace
       block:
-
-        - name: Log in (obtain access token)
-          community.okd.openshift_auth:
-            host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
-            ca_cert: ca.pem
-            validate_certs: no
-          register: openshift_auth_results
 
         - name: Setting up workload for user
           ansible.builtin.debug:
@@ -261,7 +253,7 @@
        
       always:
         - name: If login succeeded, try to log out (revoke access token)
-          when: openshift_auth_results.openshift_auth.api_key is defined
+          when: openshift_auth.api_key is defined
           community.okd.openshift_auth:
             state: absent
-            api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+            api_key: "{{ openshift_auth.api_key }}"

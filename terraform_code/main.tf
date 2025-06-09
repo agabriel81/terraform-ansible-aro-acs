@@ -220,6 +220,23 @@ resource "azurerm_network_interface_security_group_association" "jumphost_nsg_as
   network_security_group_id = azurerm_network_security_group.jumphost_nsg.id
 }
 
+resource "null_resource" "ansible_playbook" {
+  depends_on = [azurerm_redhat_openshift_cluster.aro_cluster]
+
+  provisioner "remote-exec" {
+    inline = [
+      "ansible-playbook playbook.yml"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      private_key = file("~/.ssh/id_rsa_aro")
+      host        = azurerm_linux_virtual_machine.jumphost.public_ip
+    }
+  }
+}
+
 output "console_url" {
   value = azurerm_redhat_openshift_cluster.aro_cluster.console_url
 }

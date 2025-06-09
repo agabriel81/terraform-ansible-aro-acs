@@ -200,6 +200,15 @@
                       limits:
                         memory: 2Gi
                         cpu: 1
+                scannerV4:
+                  db:
+                    resources:
+                      requests:
+                        memory: 512Mi
+                        cpu: 250m
+                      limits:
+                        memory: 2Gi
+                        cpu: 1
           register: r_k8s
           until: r_k8s is successful
           retries: 30

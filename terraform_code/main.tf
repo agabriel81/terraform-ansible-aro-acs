@@ -1,7 +1,6 @@
 # since these variables are re-used - a locals block makes this more maintainable
 locals {
-  openshift_api_url              = azurerm_redhat_openshift_cluster.aro_cluster.apiserver_profile[0].url
-  admin_password                 = azurerm_redhat_openshift_cluster.aro_cluster.cluster_admin_password
+  openshift_api_url              = "${azurerm_redhat_openshift_cluster.aro_cluster.api_server_profile[0].url}"
   jumphost_pip                   = "${var.cluster_name}-jumphost-pip"
   jumphost_subnet_cidr           = "${var.jumphost_subnet_cidr}"
   jumphost_nsg                   = "${var.cluster_name}-jumphost_nsg"
@@ -185,7 +184,6 @@ resource "azurerm_linux_virtual_machine" "jumphost" {
     public_key = file("~/.ssh/id_rsa_aro.pub")
   }
 
-
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
@@ -222,13 +220,58 @@ resource "azurerm_network_interface_security_group_association" "jumphost_nsg_as
   network_security_group_id = azurerm_network_security_group.jumphost_nsg.id
 }
 
+resource "null_resource" "get_ocp_token" {
+
+  provisioner "local-exec" {
+    command = <<EOT
+#!/bin/bash
+set -e
+
+# Variables
+CLUSTER_NAME="${var.cluster_name}"
+RESOURCE_GROUP="${var.resourcegroup_name}"
+
+# Get kubeadmin password
+CREDENTIALS=$(az aro list-credentials --name "$CLUSTER_NAME" --resource-group "$RESOURCE_GROUP")
+PASSWORD=$(echo "$CREDENTIALS" | jq -r '.kubeadminPassword')
+USERNAME=$(echo "$CREDENTIALS" | jq -r '.kubeadminUsername')
+
+# Get API URL from Terraform output
+API_URL=$(terraform output -raw openshift_api_url)
+
+# Login and extract token
+oc login "$API_URL" -u "$USERNAME" -p "$PASSWORD" --insecure-skip-tls-verify=true
+
+oc whoami -t > /tmp/openshift.token
+
+echo "Token saved to openshift.token"
+EOT
+  }
+
+  depends_on = [
+    azurerm_redhat_openshift_cluster.aro_cluster
+  ]
+}
+
 resource "null_resource" "ansible_playbook" {
-  depends_on = [azurerm_redhat_openshift_cluster.aro_cluster]
+  depends_on = [null_resource.get_ocp_token]
+
+  provisioner "file" {
+    source      = "/tmp/openshift.token"
+    destination = "/tmp/openshift.token"
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      private_key = file("~/.ssh/id_rsa_aro")
+      host        = azurerm_public_ip.aro_jumphost_pip
+    }
+  }
 
   provisioner "remote-exec" {
     inline = [
       "export K8S_AUTH_HOST=${local.openshift_api_url}",
-      "export K8S_AUTH_API_KEY=${local.admin_password}"
+      "export K8S_AUTH_API_KEY=$(cat /tmp/openshift.token)",
       "ansible-playbook playbook.yml"
     ]
 
@@ -236,7 +279,7 @@ resource "null_resource" "ansible_playbook" {
       type        = "ssh"
       user        = "adminuser"
       private_key = file("~/.ssh/id_rsa_aro")
-      host        = azurerm_linux_virtual_machine.jumphost.public_ip
+      host        = azurerm_public_ip.aro_jumphost_pip
     }
   }
 }

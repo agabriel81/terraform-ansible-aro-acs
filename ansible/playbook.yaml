@@ -230,33 +230,12 @@
           retries: 30
           delay: 5
        
-        - name: Get Web Console route
-          kubernetes.core.k8s_info:
-            api_version: route.openshift.io/v1
-            kind: Route
-            namespace: openshift-console
-            name: console
-          register: r_console_route
-          until: r_console_route is successful
-          retries: 30
-          delay: 5
-       
-        - name: Get API server URL
-          kubernetes.core.k8s_info:
-            api_version: config.openshift.io/v1
-            kind: Infrastructure
-            name: cluster
-          register: r_api_url
-          until: r_api_url is successful
-          retries: 30
-          delay: 5
-
         - name: Print info
           ansible.builtin.debug:
             msg:
             - ""
             - "Your RHACS console is available at:"
-            - "https://{{ acs_route }}"
+            - "https://{{ r_acs_portal_route }}"
             - "RHACS portal username: admin"
             - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
        

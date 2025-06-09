@@ -14,9 +14,10 @@ Prerequisites and versions:
 - ACS: 4.6
 ```
 
-Clone the repository and change to repo directory:
+Clone the repository, switch to the branch and change to the repository directory:
 ```
 $ https://github.com/agabriel81/terraform-ansible-aro-acs.git
+$ git checkout 4.17-4.6
 $ cd terraform-ansible-aro-acs/terraform-code
 ```
 

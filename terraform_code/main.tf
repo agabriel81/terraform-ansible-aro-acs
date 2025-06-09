@@ -74,6 +74,9 @@ resource "azurerm_subnet" "master_subnet" {
   virtual_network_name = azurerm_virtual_network.aro_vnet.name
   address_prefixes     = [local.aro_master_subnet_cidr]
   service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "azurerm_subnet" "worker_subnet" {
@@ -236,11 +239,8 @@ CREDENTIALS=$(az aro list-credentials --name "$CLUSTER_NAME" --resource-group "$
 PASSWORD=$(echo "$CREDENTIALS" | jq -r '.kubeadminPassword')
 USERNAME=$(echo "$CREDENTIALS" | jq -r '.kubeadminUsername')
 
-# Get API URL from Terraform output
-API_URL=$(terraform output -raw openshift_api_url)
-
 # Login and extract token
-oc login "$API_URL" -u "$USERNAME" -p "$PASSWORD" --insecure-skip-tls-verify=true
+oc login "${local.openshift_api_url}" -u "$USERNAME" -p "$PASSWORD" --insecure-skip-tls-verify=true
 
 oc whoami -t > /tmp/openshift.token
 
@@ -251,6 +251,11 @@ EOT
   depends_on = [
     azurerm_redhat_openshift_cluster.aro_cluster
   ]
+}
+
+data "azurerm_public_ip" "jumphost_public_ip" {
+  name                = azurerm_public_ip.aro_jumphost_pip.name
+  resource_group_name = azurerm_linux_virtual_machine.jumphost.resource_group_name
 }
 
 resource "null_resource" "ansible_playbook" {
@@ -264,7 +269,7 @@ resource "null_resource" "ansible_playbook" {
       type        = "ssh"
       user        = "adminuser"
       private_key = file("~/.ssh/id_rsa_aro")
-      host        = azurerm_public_ip.aro_jumphost_pip
+      host        = data.azurerm_public_ip.jumphost_public_ip.ip_address
     }
   }
 
@@ -272,14 +277,15 @@ resource "null_resource" "ansible_playbook" {
     inline = [
       "export K8S_AUTH_HOST=${local.openshift_api_url}",
       "export K8S_AUTH_API_KEY=$(cat /tmp/openshift.token)",
-      "ansible-playbook playbook.yml"
+      "git clone -b 4.17-4.6 https://github.com/agabriel81/terraform-ansible-aro-acs.git",
+      "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml"
     ]
 
     connection {
       type        = "ssh"
       user        = "adminuser"
       private_key = file("~/.ssh/id_rsa_aro")
-      host        = azurerm_public_ip.aro_jumphost_pip
+      host        = data.azurerm_public_ip.jumphost_public_ip.ip_address
     }
   }
 }
@@ -290,11 +296,6 @@ output "console_url" {
 
 output "api_url" {
   value = azurerm_redhat_openshift_cluster.aro_cluster.api_server_profile[0].url
-}
-
-data "azurerm_public_ip" "jumphost_public_ip" {
-  name                = azurerm_public_ip.aro_jumphost_pip.name
-  resource_group_name = azurerm_linux_virtual_machine.jumphost.resource_group_name
 }
 
 output "jumphost_public_ip" {

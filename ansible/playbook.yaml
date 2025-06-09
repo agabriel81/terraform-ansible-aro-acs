@@ -2,15 +2,22 @@
   hosts: localhost
   vars_files:
     - vars/var_file.yaml
-  module_defaults:
-    community.okd.openshift_auth:
-      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
-      ca_cert: ca.pem
-      validate_certs: no
-    register: openshift_auth_results
+#  module_defaults:
+#    community.okd.openshift_auth:
+#      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
+#      ca_cert: ca.pem
+#      validate_certs: no
+#    register: openshift_auth_results
   tasks:
     - name: Authenticate to OpenShift cluster and gell a list of all pods from any namespace
       block:
+
+        - name: Log in (obtain access token)
+          community.okd.openshift_auth:
+            host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
+            ca_cert: ca.pem
+            validate_certs: no
+          register: openshift_auth_results
 
         - name: Setting up workload for user
           ansible.builtin.debug:

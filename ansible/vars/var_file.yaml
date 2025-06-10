@@ -16,4 +16,3 @@ ocp4_workload_rhacs_enable_central_scanner_v4: true
 # To avoid browser cert nag screens, this adds the Stackrox CA cert to the Route for Central.
 # change this once we're happy that it works consistently
 ocp4_workload_rhacs_enable_route_certs: true
-~                                            

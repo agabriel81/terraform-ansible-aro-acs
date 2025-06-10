@@ -169,8 +169,7 @@ resource "azurerm_linux_virtual_machine" "jumphost" {
   resource_group_name = azurerm_resource_group.aro_rg.name
   location            = azurerm_resource_group.aro_rg.location
   size                = "Standard_B2s"
-  custom_data         = base64encode(templatefile("./customdata.tpl"))
-  }
+  custom_data         = base64encode(templatefile("./customdata.tpl",{}))
 
   admin_username      = "adminuser"
   network_interface_ids = [

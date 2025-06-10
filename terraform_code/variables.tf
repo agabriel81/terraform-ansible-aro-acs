@@ -1,3 +1,7 @@
+variable "branch" {
+  type = string
+}
+
 variable "location" {
   type = string
 }

@@ -1,0 +1,48 @@
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  namespace: stackrox
+  name: stackrox-secured-cluster-services
+spec:
+  clusterName: production
+  admissionControl:
+    listenOnCreates: true
+    listenOnEvents: true
+    listenOnUpdates: true
+    bypass: BreakGlassAnnotation
+    timeoutSeconds: 3
+    contactImageScanners: ScanIfMissing
+  perNode:
+    collector:
+      collection: EBPF
+      imageFlavor: Regular
+    taintToleration: TolerateTaints
+  sensor:
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 4Gi
+        cpu: 2
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Disabled
+        replicas: 1
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 250m
+        limits:
+          memory: 2Gi
+          cpu: 1
+  scannerV4:
+    db:
+      resources:
+        requests:
+          memory: 1500Mi
+          cpu: 250m
+        limits:
+          memory: 3Gi
+          cpu: 2

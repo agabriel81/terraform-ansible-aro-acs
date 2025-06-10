@@ -31,6 +31,7 @@ $ export TF_VAR_resourcegroup_name=aro-ger-agabriel
 $ export TF_VAR_cluster_name=aro-ger-cluster
 $ export ARM_SUBSCRIPTION_ID=<your subscription ID>
 $ export TF_VAR_acs_password=<your Red Hat ACS password>
+$ export branch=<git branch in use>
 ```
 
 Check if you want to override any variable (VNET, master/worker subnet name and CIDR etc) using the `override.tf_to_be_implemented` example file (by renaming it `override.tf`)

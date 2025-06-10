@@ -41,13 +41,6 @@
           retries: 30
           delay: 5
 
-        - name: Generate random password for Central admin
-          ansible.builtin.set_fact:
-            ocp4_workload_rhacs_central_admin_password: >-
-                {{ lookup('password', '/dev/null chars=ascii_letters,digits '
-                   ~ 'length=18'
-                ) }}
-
         - name: Create Secret for Central admin password
           kubernetes.core.k8s:
             state: present

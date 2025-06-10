@@ -169,13 +169,8 @@ resource "azurerm_linux_virtual_machine" "jumphost" {
   resource_group_name = azurerm_resource_group.aro_rg.name
   location            = azurerm_resource_group.aro_rg.location
   size                = "Standard_B2s"
-  custom_data         = base64encode(templatefile("./customdata.tpl",
-    {
-      subscription = local.subscription,
-      secret       = local.secret,
-      tenant       = local.tenant,
-      client_id    = local.client_id
-    }))
+  custom_data         = base64encode(templatefile("./customdata.tpl"))
+  }
 
   admin_username      = "adminuser"
   network_interface_ids = [
@@ -220,7 +215,7 @@ resource "azurerm_network_security_group" "jumphost_nsg" {
 
 resource "azurerm_network_interface_security_group_association" "jumphost_nsg_association" {
   network_interface_id          = azurerm_network_interface.jumphost_nic.id
-  network_security_group_id = azurerm_network_security_group.jumphost_nsg.id
+  network_security_group_id     = azurerm_network_security_group.jumphost_nsg.id
 }
 
 resource "null_resource" "get_ocp_token" {

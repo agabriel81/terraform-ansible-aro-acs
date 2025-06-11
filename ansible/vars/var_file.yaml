@@ -13,6 +13,7 @@ ocp4_workload_pipelines_install_operator_namespace: openshift-operators
 ocp4_workload_pipelines_install_operator_channel: pipelines-1.18
 
 ocp4_workload_pipelines_install_operator_use_catalog_snapshot: false
+ocp4_workload_pipelines_install_operator_packagemanifest_name: openshift-pipelines-operator-rh
 ocp4_workload_pipelines_install_operator_catalog_source_tag: "v4.17"
 
 ocp4_workload_rhacs_central_namespace: stackrox

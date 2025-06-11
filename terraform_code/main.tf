@@ -280,7 +280,7 @@ resource "null_resource" "ansible_playbook" {
       "echo 'export K8S_AUTH_HOST=${local.openshift_api_url}' >> ~/.bashrc",
       "echo 'export K8S_AUTH_API_KEY=$(cat /tmp/openshift.token)' >> ~/.bashrc",
       "source ~/.bashrc",
-      "oc login $K8S_AUTH_HOST --token=$K8S_AUTH_API_KEY"
+      "oc login $K8S_AUTH_HOST --token=$K8S_AUTH_API_KEY",
       "git clone -b ${var.branch} https://github.com/agabriel81/terraform-ansible-aro-acs.git",
       "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml -e ocp4_workload_rhacs_central_admin_password=${var.acs_password}"
     ]

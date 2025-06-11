@@ -1,0 +1,66 @@
+variable "branch" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "resourcegroup_name" {
+  type = string
+}
+
+variable "cluster_name" {
+  type = string
+}
+
+variable "pull_secret" {
+    type = string
+}
+
+variable "cluster_domain" {
+    type = string
+}
+
+variable "cluster_version" {
+    type = string
+}
+
+variable "vnet_name" {
+    type = string
+    default = "aro-vnet"
+}
+
+variable "vnet_cidr" {
+    type = string
+    default = "10.0.0.0/22"
+}
+
+variable "master_subnet" {
+    type = string
+    default = "master-subnet"
+}
+
+variable "master_subnet_cidr" {
+    type = string
+    default = "10.0.0.0/24"
+}
+
+variable "worker_subnet" {
+    type = string
+    default = "worker-subnet"
+}
+
+variable "worker_subnet_cidr" {
+    type = string
+    default = "10.0.1.0/24"
+}
+
+variable "jumphost_subnet_cidr" {
+    type = string
+    default = "10.0.2.0/27"
+}
+
+variable "acs_password" {
+  type = string
+}

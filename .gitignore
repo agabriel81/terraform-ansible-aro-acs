@@ -1,0 +1,3 @@
+terraform_code/.terraform/*
+terraform_code/terraform.tfstate*
+terraform_code/.terraform*

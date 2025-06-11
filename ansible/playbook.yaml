@@ -1,0 +1,53 @@
+- name: Day-1 Configure ARO cluster Playbook
+  hosts: localhost
+  vars_files:
+    - vars/var_file.yaml
+  module_defaults:
+    community.okd.openshift_auth:
+      host: "'{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST') }}'"
+      ca_cert: ca.pem
+      validate_certs: no
+  tasks:
+    - name: Authenticate to OpenShift cluster, install RHACS Operator, RHACS Central and RHACS Sensor
+      block:
+
+        - name: Setting up workload for user
+          ansible.builtin.debug:
+            msg: "Setting up RHACS for user ocp_username = {{ ocp_username }}"
+
+        - name: Install ACS Operator
+          ansible.builtin.include_role:
+            name: install_operator
+          vars:
+            install_operator_action: install
+            install_operator_name: rhacs-operator
+            install_operator_namespace: "{{ ocp4_workload_rhacs_install_operator_namespace }}"
+            install_operator_channel: "{{ ocp4_workload_rhacs_install_operator_channel | default('') }}"
+            # ignored install_operator_catalog: redhat-operators
+            install_operator_use_catalog_snapshot: "{{ ocp4_workload_rhacs_install_operator_use_catalog_snapshot }}"
+            # unknown install_operator_catalogsource_name: "{{ ocp4_workload_rhacs_install_operator_channel | default('') }}"
+            install_operator_catalogsource_image_tag: "{{ ocp4_workload_rhacs_install_operator_catalog_source_tag | default('') }}"
+
+        - name: Install ACS Central and Sensor
+          ansible.builtin.include_role:
+            name: install_acs
+          vars:
+            ocp4_workload_rhacs_central_admin_password: "{{ ocp4_workload_rhacs_central_admin_password }}"
+            ACTION: create
+       
+        - name: Install Pipelines Operator
+          ansible.builtin.include_role:
+            name: install_operator
+          vars:
+            install_operator_action: install
+            install_operator_name: openshift-pipelines
+            install_operator_namespace: "{{ ocp4_workload_pipelines_install_operator_namespace }}"
+            install_operator_channel: "{{ ocp4_workload_pipelines_install_operator_channel | default('') }}"
+            install_operator_catalogsource_image_tag: "{{ ocp4_workload_pipelines_install_operator_catalog_source_tag | default('') }}"
+
+      always:
+        - name: If login succeeded, try to log out (revoke access token)
+          when: openshift_auth.api_key is defined
+          community.okd.openshift_auth:
+            state: absent
+            api_key: "{{ openshift_auth.api_key }}"

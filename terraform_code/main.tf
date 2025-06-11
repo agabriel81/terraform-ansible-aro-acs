@@ -223,31 +223,34 @@ resource "azurerm_network_interface_security_group_association" "jumphost_nsg_as
   network_security_group_id     = azurerm_network_security_group.jumphost_nsg.id
 }
 
-resource "null_resource" "setup_jumphost" {
-  depends_on = [azurerm_redhat_openshift_cluster.aro_cluster]
-  provisioner "remote-exec" {
-    inline = [
-      "set -e",
-      "mkdir ~/bin",
-      "curl -k  https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux-amd64-rhel8.tar.gz| tar xfz - -C ~/bin",
-      "chmod +x ~/bin/oc",
-      "CLUSTER_NAME='${var.cluster_name}'",
-      "RESOURCE_GROUP='${var.resourcegroup_name}'",
-      "CREDENTIALS=$(az aro list-credentials --name \"$CLUSTER_NAME\" --resource-group \"$RESOURCE_GROUP\")",
-      "PASSWORD=$(echo \"$CREDENTIALS\" | jq -r '.kubeadminPassword')",
-      "USERNAME=$(echo \"$CREDENTIALS\" | jq -r '.kubeadminUsername')",
-      "oc login '${local.openshift_api_url}' -u \"$USERNAME\" -p \"$PASSWORD\" --insecure-skip-tls-verify=true",
-      "oc whoami -t > /tmp/openshift.token",
-      "echo 'Token saved to /tmp/openshift.token'"
-    ]
+resource "null_resource" "get_ocp_token" {
 
-    connection {
-      type        = "ssh"
-      user        = "adminuser"
-      private_key = file("~/.ssh/id_rsa_aro")
-      host        = data.azurerm_public_ip.jumphost_public_ip.ip_address
-    }
+  provisioner "local-exec" {
+    command = <<EOT
+#!/bin/bash
+set -e
+
+# Variables
+CLUSTER_NAME="${var.cluster_name}"
+RESOURCE_GROUP="${var.resourcegroup_name}"
+
+# Get kubeadmin password
+CREDENTIALS=$(az aro list-credentials --name "$CLUSTER_NAME" --resource-group "$RESOURCE_GROUP")
+PASSWORD=$(echo "$CREDENTIALS" | jq -r '.kubeadminPassword')
+USERNAME=$(echo "$CREDENTIALS" | jq -r '.kubeadminUsername')
+
+# Login and extract token
+oc login "${local.openshift_api_url}" -u "$USERNAME" -p "$PASSWORD" --insecure-skip-tls-verify=true
+
+oc whoami -t > /tmp/openshift.token
+
+echo "Token saved to openshift.token"
+EOT
   }
+
+  depends_on = [
+    azurerm_redhat_openshift_cluster.aro_cluster
+  ]
 }
 
 data "azurerm_public_ip" "jumphost_public_ip" {
@@ -256,13 +259,28 @@ data "azurerm_public_ip" "jumphost_public_ip" {
 }
 
 resource "null_resource" "ansible_playbook" {
-  depends_on = [null_resource.setup_jumphost]
+  depends_on = [null_resource.get_ocp_token]
+
+  provisioner "file" {
+    source      = "/tmp/openshift.token"
+    destination = "/tmp/openshift.token"
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      private_key = file("~/.ssh/id_rsa_aro")
+      host        = data.azurerm_public_ip.jumphost_public_ip.ip_address
+    }
+  }
 
   provisioner "remote-exec" {
     inline = [
+      "mkdir ~/bin",
+      "curl -k  https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux-amd64-rhel8.tar.gz| tar xfz - -C ~/bin",
       "echo 'export K8S_AUTH_HOST=${local.openshift_api_url}' >> ~/.bashrc",
       "echo 'export K8S_AUTH_API_KEY=$(cat /tmp/openshift.token)' >> ~/.bashrc",
-      "source ~./bashrc",
+      "source ~/.bashrc",
+      "oc login $K8S_AUTH_HOST --token=$K8S_AUTH_API_KEY"
       "git clone -b ${var.branch} https://github.com/agabriel81/terraform-ansible-aro-acs.git",
       "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml -e ocp4_workload_rhacs_central_admin_password=${var.acs_password}"
     ]

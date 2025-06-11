@@ -62,8 +62,15 @@ $ az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query 
 $ oc login $(az aro show -g ${TF_VAR_resourcegroup_name} -n ${TF_VAR_cluster_name} --query apiserverProfile.url -o tsv) -u kubeadmin
 ```
 
-If it's needed to debug the Ansible playbook, please export the `K8S_AUTH_API_KEY` and `K8S_AUTH_HOST` in the `jumphost` Virtual Machine.
+If it's needed to debug the Ansible playbook, please export the `K8S_AUTH_API_KEY` and `K8S_AUTH_HOST` in the `jumphost` Virtual Machine using:
+
+```
+$ source ~/.bashrc
+```
+
+The jumphost is equipped with the `az` CLI and `oc` CLI.
 The ARO API token is saved into the `/tmp/openshift.token` both locally and in the `jumphost`.
+The Azure environment credentials are saved into the `~/.azure/credentials` file.
 
 
 REFERENCE

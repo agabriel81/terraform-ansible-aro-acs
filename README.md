@@ -10,8 +10,9 @@ Prerequisites and versions:
 - login to the Microsoft Azure infrastructure for the `az` client 
 ```
 ```
-- ARO: 4.17
-- ACS: 4.6
+- ARO (Azure Red Hat OpenShift) version: 4.17
+- RHACS (Red Hat Advanced Cluster Security) version: 4.6
+- OpenShift Pipelines operator version: 1.18
 ```
 
 Clone the repository, switch to the branch and change to the repository directory:

@@ -154,11 +154,3 @@
           retries: 30
           delay: 5
        
-        - name: Print info
-          ansible.builtin.debug:
-            msg:
-            - ""
-            - "Your RHACS console is available at:"
-            - "https://{{ r_acs_portal_route.resources[0].spec.host }}"
-            - "RHACS portal username: admin"
-            - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"

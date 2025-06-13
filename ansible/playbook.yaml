@@ -46,6 +46,11 @@
             install_operator_channel: "{{ ocp4_workload_pipelines_install_operator_channel | default('') }}"
             install_operator_catalogsource_image_tag: "{{ ocp4_workload_pipelines_install_operator_catalog_source_tag | default('') }}"
 
+        - name: Run Print info task from install_acs role
+          include_role:
+            name: install_acs
+            tasks_from: print_info
+
       always:
         - name: If login succeeded, try to log out (revoke access token)
           when: openshift_auth.api_key is defined

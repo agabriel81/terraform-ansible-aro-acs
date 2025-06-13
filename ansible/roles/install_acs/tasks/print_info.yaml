@@ -7,3 +7,5 @@
     - "RHACS portal username: admin"
     - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
     - "###############################################################################"
+  tags:
+    - output

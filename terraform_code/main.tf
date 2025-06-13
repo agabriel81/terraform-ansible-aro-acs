@@ -285,7 +285,8 @@ resource "null_resource" "ansible_playbook" {
       "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml -e ocp4_workload_rhacs_central_admin_password=${var.acs_password}",
       "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/kubernetes-manifests/ --recursive",
       "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/skupper-demo/ --recursive",
-      "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/openshift-pipelines/ --recursive"
+      "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/openshift-pipelines/ --recursive",
+      "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml --tags "output"}"
     ]
 
     connection {

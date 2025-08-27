@@ -11,26 +11,25 @@ Prerequisites and versions:
 ```
 ```
 - ARO (Azure Red Hat OpenShift) version: 4.17
-- RHACS (Red Hat Advanced Cluster Security) version: 4.6
+- RHACS (Red Hat Advanced Cluster Security) version: 4.8
 - OpenShift Pipelines operator version: 1.18
 ```
 
 Clone the repository, switch to the branch and change to the repository directory:
 ```
 $ https://github.com/agabriel81/terraform-ansible-aro-acs.git
-$ git checkout 4.17-4.6
+$ git checkout 4.17-4.8
 $ cd terraform-ansible-aro-acs/terraform-code
 ```
 
 Start the Terraform process by passing few variables:
 ```
 $ export TF_VAR_pull_secret='{"auths":{"arosvc.azurecr.io....'
-$ export TF_VAR_cluster_domain=agabriel-ger
+$ export TF_VAR_cluster_domain=agabriel-neu
 $ export TF_VAR_cluster_version=4.17.27
-$ export TF_VAR_location=germanywestcentral
-$ export TF_VAR_resourcegroup_name=aro-ger-agabriel
-$ export TF_VAR_cluster_name=aro-ger-cluster
-$ export ARM_SUBSCRIPTION_ID=<your subscription ID>
+$ export TF_VAR_location=northeurope
+$ export TF_VAR_resourcegroup_name=aro-neu-agabriel
+$ export TF_VAR_cluster_name=aro-neu-cluster
 $ export TF_VAR_acs_password=<your Red Hat ACS password>
 $ export TF_VAR_branch=<git branch in use>
 ```

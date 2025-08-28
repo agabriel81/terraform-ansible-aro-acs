@@ -15,6 +15,9 @@
       wait: true
       wait_timeout: 1800
     register: cluster_operators
+    until: cluster_operators.failed is not defined or not cluster_operators.failed
+    retries: 10
+    delay: 30
 
   tasks:
     - name: Authenticate to OpenShift cluster, install RHACS Operator, RHACS Central and RHACS Sensor

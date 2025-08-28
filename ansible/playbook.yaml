@@ -8,19 +8,13 @@
       validate_certs: no
 
   pre_tasks:
-    - name: Wait for all ClusterOperators to be ready
-      kubernetes.core.k8s_info:
-        api_version: config.openshift.io/v1
-        kind: ClusterOperator
-      register: cluster_operators
-      until:
-        - cluster_operators is not failed
-        - cluster_operators.resources is defined
-        - cluster_operators | json_query('resources[*].status.conditions[?type==`Available`].status') | unique == ['True']
-        - cluster_operators | json_query('resources[*].status.conditions[?type==`Progressing`].status') | unique == ['False']
-        - cluster_operators | json_query('resources[*].status.conditions[?type==`Degraded`].status') | unique == ['False']
-      retries: 20
-      delay: 30
+  - name: Wait for cluster operators
+    kubernetes.core.k8s_info:
+      api_version: config.openshift.io/v1
+      kind: ClusterOperator
+      wait: true
+      wait_timeout: 1800
+    register: cluster_operators
 
   tasks:
     - name: Authenticate to OpenShift cluster, install RHACS Operator, RHACS Central and RHACS Sensor

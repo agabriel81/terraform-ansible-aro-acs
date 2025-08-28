@@ -18,7 +18,7 @@ Prerequisites and versions:
 Clone the repository, switch to the branch and change to the repository directory:
 ```
 $ https://github.com/agabriel81/terraform-ansible-aro-acs.git
-$ git checkout 4.17-4.8
+$ git checkout 4.17-4.8-plus-apps
 $ cd terraform-ansible-aro-acs/terraform-code
 ```
 

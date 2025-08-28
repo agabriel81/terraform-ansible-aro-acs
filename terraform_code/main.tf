@@ -283,6 +283,7 @@ resource "null_resource" "ansible_playbook" {
       "oc login $K8S_AUTH_HOST --token=$K8S_AUTH_API_KEY --insecure-skip-tls-verify=true",
       "git clone -b ${var.branch} https://github.com/agabriel81/terraform-ansible-aro-acs.git",
       "ansible-playbook /home/adminuser/terraform-ansible-aro-acs/ansible/playbook.yaml -e ocp4_workload_rhacs_central_admin_password=${var.acs_password}",
+      "oc new-project acs-fake-apps",
       "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/kubernetes-manifests/ --recursive",
       "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/skupper-demo/ --recursive",
       "oc apply -f ~/terraform-ansible-aro-acs/sample_applications/openshift-pipelines/ --recursive"

@@ -19,7 +19,6 @@
   tasks:
     - name: Authenticate to OpenShift cluster, install RHACS Operator, RHACS Central and RHACS Sensor
       block:
-
         - name: Setting up workload for user
           ansible.builtin.debug:
             msg: "Setting up RHACS for user ocp_username = {{ ocp_username }}"
@@ -55,14 +54,29 @@
             ocp4_workload_rhacs_central_admin_password: "{{ ocp4_workload_rhacs_central_admin_password }}"
             ACTION: create
        
-        - name: Run Print info task from install_acs role
-          include_role:
-            name: install_acs
-            tasks_from: print_info
-
       always:
         - name: If login succeeded, try to log out (revoke access token)
           when: openshift_auth.api_key is defined
           community.okd.openshift_auth:
             state: absent
             api_key: "{{ openshift_auth.api_key }}"
+
+    - name: Get the ACS portal route
+      tags: print_acs_info
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: central
+        namespace: stackrox
+      register: r_acs_portal_route
+
+    - name: Print info
+      tags: print_acs_info
+      ansible.builtin.debug:
+        msg:
+        - "####################### ACS endpoints and credentials #########################"
+        - "Your RHACS console is available at:"
+        - "https://{{ r_acs_portal_route.resources[0].spec.host }}"
+        - "RHACS portal username: admin"
+        - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
+        - "###############################################################################"

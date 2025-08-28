@@ -1,3 +1,11 @@
+- name: Get the ACS portal route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: central
+    namespace: stackrox
+  register: r_acs_portal_route
+
 - name: Print info
   ansible.builtin.debug:
     msg:
@@ -7,5 +15,3 @@
     - "RHACS portal username: admin"
     - "RHACS portal password: {{ ocp4_workload_rhacs_central_admin_password }}"
     - "###############################################################################"
-  tags:
-    - output

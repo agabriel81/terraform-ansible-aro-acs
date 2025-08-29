@@ -17,22 +17,11 @@ options:
 additional_build_files:
   - src: ./ansible.cfg
     dest: ./
-#  - src: /Users/agabriel/NotBackedUp/git_repos/entitlement.pem
-#    dest: ./
-#  - src: /Users/agabriel/NotBackedUp/git_repos/entitlement-key.pem
-#    dest: ./
  
 
 additional_build_steps:
-#  prepend_builder:
-#    - ENV PKGMGR_OPTS="--nodocs --setopt=install_weak_deps=0 --setopt=rhocp-4.17-for-rhel-8-x86_64-rpms.enabled=true"
-#  prepend_final:
-#    - ENV PKGMGR_OPTS="--nodocs --setopt=install_weak_deps=0 --setopt=rhocp-4.17-for-rhel-8-x86_64-rpms.enabled=true"
   prepend_base:
     - COPY _build/ansible.cfg /etc/ansible/ansible.cfg
-#    - RUN microdnf --disablerepo=* --enablerepo=ubi-8-baseos-rpms --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms install subscription-manager-rhsm-certificates
-#    - COPY _build/entitlement.pem /etc/pki/entitlement
-#    - COPY _build/entitlement-key.pem /etc/pki/entitlement
   append_base:
     - RUN curl "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_amd64.zip" -o "/terraform.zip"
     - RUN unzip /terraform.zip -d /terraform

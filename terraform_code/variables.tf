@@ -1,17 +1,16 @@
-variable "branch" {
-  type = string
-}
-
 variable "location" {
   type = string
+  default = "northeurope"
 }
 
 variable "resourcegroup_name" {
   type = string
+  default = "aro-agabriel"
 }
 
 variable "cluster_name" {
   type = string
+  default = "aro-cluster"
 }
 
 variable "pull_secret" {
@@ -20,10 +19,12 @@ variable "pull_secret" {
 
 variable "cluster_domain" {
     type = string
+    default = "agabriel"
 }
 
 variable "cluster_version" {
     type = string
+    default = "4.17.27"
 }
 
 variable "vnet_name" {
@@ -56,11 +57,3 @@ variable "worker_subnet_cidr" {
     default = "10.0.1.0/24"
 }
 
-variable "jumphost_subnet_cidr" {
-    type = string
-    default = "10.0.2.0/27"
-}
-
-variable "acs_password" {
-  type = string
-}

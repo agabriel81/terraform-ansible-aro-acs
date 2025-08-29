@@ -1,36 +1,13 @@
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=4.30.0"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "=2.53.1"
-    }
-  }
-}
-
-# Configure the Microsoft Azure Provider
-provider "azurerm" {
-  resource_provider_registrations = "none"
-  features {}
-}
-
 # since these variables are re-used - a locals block makes this more maintainable
 locals {
   openshift_api_url              = "${azurerm_redhat_openshift_cluster.aro_cluster.api_server_profile[0].url}"
-  aro_app_name                   = "${var.cluster_name}-app"
-  aro_vnet_name                  = "${var.cluster_name}-vnet"
-  aro_custom_domain              = "${var.cluster_name}.openshift.internal"
-  aro_master_subnet_name         = "${var.master_subnet}-${var.cluster_name}"
-  aro_worker_subnet_name         = "${var.worker_subnet}-${var.cluster_name}"
+  aro_app_name                   = "${var.resourcegroup_name}-app"
+  aro_vnet_name                  = "${var.resourcegroup_name}-vnet"
+  aro_master_subnet_name         = "${var.master_subnet}-${var.resourcegroup_name}"
+  aro_worker_subnet_name         = "${var.worker_subnet}-${var.resourcegroup_name}"
   aro_master_subnet_cidr         = "${var.master_subnet_cidr}"
   aro_worker_subnet_cidr         = "${var.worker_subnet_cidr}"
   aro_vnet_cidr                  = "${var.vnet_cidr}"
-  aro_vnet_link                  = "${var.cluster_name}-private-dns-link"
   subscription                   = "${data.azurerm_client_config.azurerm_client.subscription_id}"
   client_id                      = "${data.azurerm_client_config.azurerm_client.client_id}"
   tenant                         = "${data.azurerm_client_config.azurerm_client.tenant_id}"
@@ -41,14 +18,12 @@ data "azurerm_client_config" "azurerm_client" {}
 
 data "azuread_client_config" "azuread_client" {}
 
-resource "azuread_application_registration" "azuread_app" {
+resource "azuread_application" "azuread_app" {
   display_name = local.aro_app_name
 }
 
 resource "azuread_service_principal" "azuread_sp" {
-  client_id = azuread_application_registration.azuread_app.client_id
-  app_role_assignment_required = false
-  owners                       = [data.azuread_client_config.azuread_client.object_id]
+  client_id = azuread_application.azuread_app.client_id
 }
 
 resource "azuread_service_principal_password" "azuread_sp_pwd" {
@@ -160,6 +135,3 @@ output "api_url" {
   value = azurerm_redhat_openshift_cluster.aro_cluster.api_server_profile[0].url
 }
 
-output "jumphost_public_ip" {
-  value = data.azurerm_public_ip.jumphost_public_ip.ip_address
-}

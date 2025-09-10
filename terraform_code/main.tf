@@ -18,12 +18,12 @@ data "azurerm_client_config" "azurerm_client" {}
 
 data "azuread_client_config" "azuread_client" {}
 
-resource "azuread_application" "azuread_app" {
+resource "azuread_application_registration" "azuread_app" {
   display_name = local.aro_app_name
 }
 
 resource "azuread_service_principal" "azuread_sp" {
-  client_id = azuread_application.azuread_app.client_id
+  client_id = azuread_application_registration.azuread_app.client_id
 }
 
 resource "azuread_service_principal_password" "azuread_sp_pwd" {

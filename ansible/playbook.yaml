@@ -7,7 +7,14 @@
     - name: Authenticate to OpenShift cluster, install RHACS Operator, RHACS Central and RHACS Sensor
       block:
 
-        - name: Terraform plan
+        - name: Delete a Terraform plan
+          tags: delete
+          cloud.terraform.terraform:
+            project_path: ./terraform/
+            state: absent
+            force_init: true
+
+        - name: Create a Terraform plan
           cloud.terraform.terraform:
             project_path: ./terraform/
             state: planned
@@ -15,10 +22,26 @@
             plan_file: tfplan.out
           register: tf_output
 
-
-        - name: Setting up workload for user
+        - name: Prints the Terraform plan
           ansible.builtin.debug:
             var: tf_output
+
+        - name: Collect Terraform version
+          tags: debug
+          ansible.builtin.shell: "terraform version"
+          register: tf_version
+
+        - name: Prints Terraform version
+          tags: debug
+          ansible.builtin.debug:
+            var: tf_version
+
+        - name: Apply a Terraform plan
+          cloud.terraform.terraform:
+            project_path: ./terraform/
+            state: present
+            force_init: true
+            plan_file: tfplan.out
 
 #        - name: Setting up workload for user
 #          ansible.builtin.debug:

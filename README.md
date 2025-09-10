@@ -3,9 +3,10 @@
 Prerequisites:
 
 ```
-Podman running on your local machine, it will support the EE
-ansible-navigator
-git
+- Podman running on your local machine: it will support the Ansible Execution Environment
+- ansible-navigator
+- git
+- az CLI
 ```
 
 Versions:
@@ -23,7 +24,7 @@ $ git checkout 4.17-4.8-plus-apps-ee
 $ cd terraform-ansible-aro-acs/ansible
 ```
 
-Pass required variables to the Terraform Collections:
+Pass required environment variables to the Terraform Collections:
 ```
 $ export TF_VAR_pull_secret='{"auths":{"arosvc.azurecr.io....'
 $ export TF_VAR_cluster_domain=agabriel-neu
@@ -33,6 +34,11 @@ $ export TF_VAR_resourcegroup_name=aro-neu-agabriel
 $ export TF_VAR_cluster_name=aro-neu-cluster
 $ export TF_VAR_acs_password=<your Red Hat ACS password>
 $ export TF_VAR_branch=<git branch in use>
+```
+
+In case of an Azure Blank environment, we should must using a SSO user via `az login` for permissions issue otherwise export following environment variables:
+
+```
 $ export ARM_SUBSCRIPTION_ID=<your Azure Subscription ID>
 $ export ARM_CLIENT_ID=<your Azure Client ID>
 $ export ARM_CLIENT_SECRET=<your Azure Client Secret>
